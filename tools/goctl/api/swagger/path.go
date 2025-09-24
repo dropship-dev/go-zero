@@ -7,7 +7,6 @@ import (
 
 	"github.com/go-openapi/spec"
 	apiSpec "github.com/zeromicro/go-zero/tools/goctl/api/spec"
-	"github.com/zeromicro/go-zero/tools/goctl/util/stringx"
 )
 
 func spec2Paths(ctx Context, srv apiSpec.Service) *spec.Paths {
@@ -71,12 +70,14 @@ func spec2Path(ctx Context, group apiSpec.Group, route apiSpec.Route) spec.PathI
 			},
 		}
 	}
-	groupName := getStringFromKVOrDefault(group.Annotation.Properties, propertyKeyGroup, "")
-	operationId := route.Handler
-	if len(groupName) > 0 {
-		operationId = stringx.From(groupName + "_" + route.Handler).ToCamel()
-	}
-	operationId = stringx.From(operationId).Untitle()
+	// groupName := getStringFromKVOrDefault(group.Annotation.Properties, propertyKeyGroup, "")
+	// operationID := route.Handler
+	// if len(groupName) > 0 {
+	// 	operationID = stringx.From(groupName + "_" + route.Handler).ToCamel()
+	// }
+	// operationID = stringx.From(operationID).Untitle()
+	handlerName := getFirstUsableString(route.AtDoc.Text, route.Handler)
+
 	op := &spec.Operation{
 		OperationProps: spec.OperationProps{
 			Description: getStringFromKVOrDefault(route.AtDoc.Properties, propertyKeyDescription, ""),
@@ -84,8 +85,8 @@ func spec2Path(ctx Context, group apiSpec.Group, route apiSpec.Route) spec.PathI
 			Produces:    getListFromInfoOrDefault(route.AtDoc.Properties, propertyKeyProduces, []string{applicationJson}),
 			Schemes:     getListFromInfoOrDefault(route.AtDoc.Properties, propertyKeySchemes, []string{schemeHttps}),
 			Tags:        getListFromInfoOrDefault(group.Annotation.Properties, propertyKeyTags, getListFromInfoOrDefault(group.Annotation.Properties, propertyKeySummary, []string{})),
-			Summary:     getStringFromKVOrDefault(route.AtDoc.Properties, propertyKeySummary, getFirstUsableString(route.AtDoc.Text, route.Handler)),
-			ID:          operationId,
+			Summary:     getStringFromKVOrDefault(route.AtDoc.Properties, propertyKeySummary, handlerName),
+			ID:          getStringFromKVOrDefault(route.AtDoc.Properties, propertyKeyOperationId, handlerName),
 			Deprecated:  getBoolFromKVOrDefault(route.AtDoc.Properties, propertyKeyDeprecated, false),
 			Parameters:  parametersFromType(ctx, route.Method, route.RequestType),
 			Security:    security,

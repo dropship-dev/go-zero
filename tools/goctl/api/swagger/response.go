@@ -46,7 +46,8 @@ func jsonResponseFromType(ctx Context, atDoc apiSpec.AtDoc, tp apiSpec.Type) *sp
 		}
 	}
 
-	p, _ := propertiesFromType(ctx, tp)
+	p, requiredFields := propertiesFromType(ctx, tp)
+	props.Required = requiredFields
 	props.Type = typeFromGoType(ctx, tp)
 	props.Properties = p
 	return &spec.Responses{
