@@ -5,9 +5,8 @@ import (
 	"path"
 	"strings"
 
+	apiSpec "github.com/dropship-dev/go-zero/tools/goctl/api/spec"
 	"github.com/go-openapi/spec"
-	apiSpec "github.com/zeromicro/go-zero/tools/goctl/api/spec"
-	"github.com/zeromicro/go-zero/tools/goctl/util/stringx"
 )
 
 func spec2Paths(ctx Context, srv apiSpec.Service) *spec.Paths {
@@ -71,12 +70,7 @@ func spec2Path(ctx Context, group apiSpec.Group, route apiSpec.Route) spec.PathI
 			},
 		}
 	}
-	groupName := getStringFromKVOrDefault(group.Annotation.Properties, propertyKeyGroup, "")
-	operationId := route.Handler
-	if len(groupName) > 0 {
-		operationId = stringx.From(groupName + "_" + route.Handler).ToCamel()
-	}
-	operationId = stringx.From(operationId).Untitle()
+
 	op := &spec.Operation{
 		OperationProps: spec.OperationProps{
 			Description: getStringFromKVOrDefault(route.AtDoc.Properties, propertyKeyDescription, ""),
