@@ -230,6 +230,10 @@ func isRequired(ctx Context, tags *apiSpec.Tags) bool {
 	if err == nil {
 		return !isOptional(ctx, tag.Options)
 	}
+	tag, err = tags.Get(tagHeader)
+	if err == nil {
+		return !isOptional(ctx, tag.Options)
+	}
 	return false
 }
 
